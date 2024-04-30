@@ -13,8 +13,6 @@ const io = require("socket.io")(server, {
     }
 });
 
-
-
 // middle ware
 app.use(express.json());
 
@@ -31,8 +29,6 @@ io.on("connection", (socket) => {
       let player = {
         socketID: socket.id,
         nickname,
-        playerType: "X",
-        points: 0,
       };
       room.addPlayer(player);
       room.turn = player;
@@ -55,8 +51,6 @@ io.on("connection", (socket) => {
         let player = {
           nickname,
           socketID: socket.id,
-          playerType: "O",
-          points: 0,
         };
         /*
         if(room.players[0].nickname === nickname){
@@ -96,7 +90,6 @@ io.on("connection", (socket) => {
 
     try {
       const room = rooms.find((room) => room.id === roomId);
-      let choice = room.turn.playerType;
       if (room.turnIndex === 0) {
         room.turn = room.players[1];
         room.turnIndex = 1;
@@ -106,7 +99,6 @@ io.on("connection", (socket) => {
       }
       io.to(roomId).emit("tapped", {
         index,
-        choice,
         room,
       });
     } catch (e) {
@@ -116,32 +108,25 @@ io.on("connection", (socket) => {
 
   socket.on("winner", async ({ winnerSocketId, roomId }) => {
     console.log("winner");
-
     try {
       const room = rooms.find((room) => room.id === roomId);
       let player = room.players.find((p) => p.socketID === winnerSocketId);
-      player.points += 1;
-      if (player.points >= 6) {
-        console.log("endgame");
-        io.to(roomId).emit("endGame", player);
-      } else {
-        io.to(roomId).emit("pointIncrease", player);
-      }
+      io.to(roomId).emit("endGame", player);
     } catch (e) {
       console.log(e);
     }
   });
 
-  socket.on("nextRound", async ({ roomId }) => {
-      try {
-        const room = rooms.find((room) => room.id === roomId);
-        room.currentRound = room.currentRound+1;
-        io.to(roomId).emit("nextRound", room);
-
-      } catch (e) {
-        console.log(e);
-      }
-    });
+  socket.on("getBoats", async ({ playerId, roomId }) => {
+    try {
+      const room = rooms.find((room) => room.id === roomId);
+      let player = room.players.find((p) => p.socketID === playerId );
+      console.log(player.boats);
+      io.to(roomId).emit("getBoats", player.boats);
+    } catch (e) {
+      console.log(e);
+    }
+  });
 
 });
 
