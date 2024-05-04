@@ -117,12 +117,14 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("getBoats", async ({ playerId, roomId }) => {
+  socket.on("getBoats", async ({ playerId1, playerId2, roomId }) => {
     try {
       const room = rooms.find((room) => room.id === roomId);
-      let player = room.players.find((p) => p.socketID === playerId );
-      console.log(player.boats);
-      io.to(roomId).emit("getBoats", player.boats);
+      let player1 = room.players.find((p) => p.socketID === playerId1 );
+      console.log(player1.boats);
+      let player2 = room.players.find((p) => p.socketID === playerId2 );
+      console.log(player2.boats);
+      io.to(roomId).emit("getBoats", player1.boats, player2.boats);
     } catch (e) {
       console.log(e);
     }
