@@ -28,7 +28,8 @@ io.on("connection", (socket) => {
       let room = new Room();
       let player = {
         socketID: socket.id,
-        nickname,
+        nickname: nickname,
+        boats: [1,1,2],
       };
       room.addPlayer(player);
       room.turn = player;
@@ -49,8 +50,9 @@ io.on("connection", (socket) => {
       const room = rooms.find((room) => room.id === roomId.toString());
       if (room.isJoin) {
         let player = {
-          nickname,
           socketID: socket.id,
+          nickname: nickname,
+          boats: [1,2,3],
         };
         /*
         if(room.players[0].nickname === nickname){
@@ -121,12 +123,16 @@ io.on("connection", (socket) => {
     try {
       const room = rooms.find((room) => room.id === roomId);
       let player1 = room.players.find((p) => p.socketID === playerId1 );
-      console.log(player1.boats);
+      let player1Boats = player1.boats;
+      console.log(player1Boats);
       let player2 = room.players.find((p) => p.socketID === playerId2 );
-      console.log(player2.boats);
-      io.to(roomId).emit("getBoats", player1.boats, player2.boats);
+      let player2Boats = player2.boats;
+      console.log(player2Boats);
+      io.to(roomId).emit("getBoats", player1Boats, player2Boats);
     } catch (e) {
-      console.log(e);
+      if(!(e instanceof TypeError)){
+        console.log(e);
+      }
     }
   });
 
