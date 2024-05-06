@@ -29,7 +29,7 @@ io.on("connection", (socket) => {
       let player = {
         socketID: socket.id,
         nickname: nickname,
-        boats: [1,1,2],
+        boats: [],
       };
       room.addPlayer(player);
       room.turn = player;
@@ -52,23 +52,21 @@ io.on("connection", (socket) => {
         let player = {
           socketID: socket.id,
           nickname: nickname,
-          boats: [1,2,3],
+          boats: [],
         };
-        /*
         if(room.players[0].nickname === nickname){
           socket.emit(
             "errorOccurred",
             "Vous ne pouvez pas vous affronter vous même  !"
           );
         }else{
-          */
           socket.join(roomId);
           room.addPlayer(player);
           room.isJoin = false;
           io.to(roomId).emit("joinRoomSuccess", room);
           io.to(roomId).emit("updatePlayers", room.players);
           io.to(roomId).emit("updateRoom", room);
-        //}
+        }
       } else {
         socket.emit(
           "errorOccurred",
@@ -119,16 +117,12 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("getBoats", async ({ playerId1, playerId2, roomId }) => {
+  socket.on("getBoats", async ({ player, roomId }) => {
     try {
+      console.log("getBoats");
       const room = rooms.find((room) => room.id === roomId);
-      let player1 = room.players.find((p) => p.socketID === playerId1 );
-      let player1Boats = player1.boats;
-      console.log(player1Boats);
-      let player2 = room.players.find((p) => p.socketID === playerId2 );
-      let player2Boats = player2.boats;
-      console.log(player2Boats);
-      io.to(roomId).emit("getBoats", player1Boats, player2Boats);
+      let player1 = room.players.find((p1) => p1.nickname === player );
+      io.to(roomId).emit("getBoats", player, player1.boats);
     } catch (e) {
       if(!(e instanceof TypeError)){
         console.log(e);

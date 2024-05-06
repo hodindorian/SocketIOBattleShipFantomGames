@@ -1,4 +1,5 @@
 const playerSchema = require("./player");
+const util = require('util')
 const uid = function () {
   let result = '';
   const characters = 'ABCDEFGHJKMNPQRSTUVWXYZ123456789';
@@ -23,6 +24,8 @@ class Room {
 
   addPlayer(player) {
     if (this.players.length < this.occupancy) {
+      player.boats.push(this.placeBoats());
+      console.log(util.inspect(player.boats, false, null, true ));
       this.players.push(player);
       return true; // Le joueur a été ajouté avec succès
     }
@@ -36,31 +39,68 @@ class Room {
     }
   }
 
-  placeBoats(longueur) {
-    const direction = Math.random() < 0.5 ? "horizontal" : "vertical";
-    const ligne = Math.floor(Math.random() * 10);
-    const colonne = Math.floor(Math.random() * 10);
+  placeBoats() {
+    const boatLengths = [5, 4, 3, 2, 1, 1];
+    const boardSize = 10;
+    const board = Array.from({ length: boardSize }, () => Array(boardSize).fill(false)); // Initialisation de la grille vide
+    const boats = [];
 
-    if (direction === "horizontal" && colonne + longueur <= 10) {
-      for (let i = 0; i < longueur; i++) {
-        if (this.tableau[ligne][colonne + i] !== 0) {
-          return this.placeBoats(longueur);
+    for (const length of boatLengths) {
+        let boatCoordinates;
+
+        do {
+            boatCoordinates = this.generateRandomBoat(boardSize, length);
+        } while (!this.isValidPlacement(board, boatCoordinates));
+
+        boats.push(boatCoordinates);
+        this.markOccupiedCells(board, boatCoordinates);
+    }
+
+    return boats;
+  }
+
+  generateRandomBoat(boardSize, length) {
+    const startX = Math.floor(Math.random() * boardSize);
+    const startY = Math.floor(Math.random() * boardSize);
+    const isHorizontal = Math.random() < 0.5;
+    const boatCoordinates = [];
+
+    if (isHorizontal) {
+        for (let i = 0; i < length; i++) {
+            const x = startX + i;
+            const y = startY;
+            if (x < boardSize) {
+                boatCoordinates.push([x, y]);
+            } else {
+                return this.generateRandomBoat(boardSize, length);
+            }
         }
-      }
-      for (let i = 0; i < longueur; i++) {
-        this.tableau[ligne][colonne + i] = longueur;
-      }
-    } else if (direction === "vertical" && ligne + longueur <= 10) {
-      for (let i = 0; i < longueur; i++) {
-        if (this.tableau[ligne + i][colonne] !== 0) {
-          return this.placeBoats(longueur);
-        }
-      }
-      for (let i = 0; i < longueur; i++) {
-        this.tableau[ligne + i][colonne] = longueur;
-      }
     } else {
-      return this.placeBoats(longueur);
+        for (let i = 0; i < length; i++) {
+            const x = startX;
+            const y = startY + i;
+            if (y < boardSize) {
+                boatCoordinates.push([x, y]);
+            } else {
+                return this.generateRandomBoat(boardSize, length);
+            }
+        }
+    }
+    return boatCoordinates;
+  }
+
+  isValidPlacement(board, boatCoordinates) {
+    for (const [x, y] of boatCoordinates) {
+        if (board[x][y]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+  markOccupiedCells(board, boatCoordinates) {
+    for (const [x, y] of boatCoordinates) {
+        board[x][y] = true;
     }
   }
 }
