@@ -1,5 +1,4 @@
 const playerSchema = require("./player");
-const util = require('util')
 const uid = function () {
   let result = '';
   const characters = 'ABCDEFGHJKMNPQRSTUVWXYZ123456789';
@@ -25,7 +24,6 @@ class Room {
   addPlayer(player) {
     if (this.players.length < this.occupancy) {
       player.boats.push(this.placeBoats());
-      console.log(util.inspect(player.boats, false, null, true ));
       this.players.push(player);
       return true; // Le joueur a été ajouté avec succès
     }

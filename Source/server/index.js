@@ -45,6 +45,7 @@ io.on("connection", (socket) => {
 
   socket.on("joinRoom", async ({ nickname, roomId }) => {
     console.log("JoinRoom");
+    console.log(nickname);
 
     try {
       const room = rooms.find((room) => room.id === roomId.toString());
