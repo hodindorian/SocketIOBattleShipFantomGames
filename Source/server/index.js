@@ -29,6 +29,7 @@ io.on("connection", (socket) => {
       let player = {
         socketID: socket.id,
         nickname: nickname,
+        nbPlayer: 1,
         boats: [],
       };
       room.addPlayer(player);
@@ -53,6 +54,7 @@ io.on("connection", (socket) => {
         let player = {
           socketID: socket.id,
           nickname: nickname,
+          nbPlayer: 2,
           boats: [],
         };
         if(room.players[0].nickname === nickname){
@@ -91,16 +93,45 @@ io.on("connection", (socket) => {
 
     try {
       const room = rooms.find((room) => room.id === roomId);
+      let actualCase = [(Math.floor(index / 10)), (index % 10)];
+      let hit = '0';
+      let actualPlayer = '';
       if (room.turnIndex === 0) {
+        actualPlayer = room.players[0].nbPlayer;
+        for (let boats of room.players[1].boats) {
+          for (let boat1 of boats){
+            for (let boatFinal of boat1){
+              if (boatFinal.every((val, idx) => val === actualCase[idx])) {
+                hit = 'X';
+                break;
+            }
+            }
+
+          }
+        }
         room.turn = room.players[1];
         room.turnIndex = 1;
       } else {
+        actualPlayer = room.players[1].nbPlayer;
+        for (let boats of room.players[0].boats) {
+          for (let boat1 of boats){
+            for (let boatFinal of boat1){
+              if (boatFinal.every((val, idx) => val === actualCase[idx])) {
+                hit = 'X';
+                break;
+              }
+            }
+
+          }
+        }
         room.turn = room.players[0];
         room.turnIndex = 0;
       }
       io.to(roomId).emit("tapped", {
         index,
         room,
+        hit,
+        actualPlayer,
       });
     } catch (e) {
       console.log(e);

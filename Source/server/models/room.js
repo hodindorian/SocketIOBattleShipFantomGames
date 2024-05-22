@@ -58,48 +58,68 @@ class Room {
   }
 
   generateRandomBoat(boardSize, length) {
-    const startX = Math.floor(Math.random() * boardSize);
-    const startY = Math.floor(Math.random() * boardSize);
-    const isHorizontal = Math.random() < 0.5;
-    const boatCoordinates = [];
+      const startX = Math.floor(Math.random() * boardSize);
+      const startY = Math.floor(Math.random() * boardSize);
+      const isHorizontal = Math.random() < 0.5;
+      const boatCoordinates = [];
 
-    if (isHorizontal) {
-        for (let i = 0; i < length; i++) {
-            const x = startX + i;
-            const y = startY;
-            if (x < boardSize) {
-                boatCoordinates.push([x, y]);
-            } else {
-                return this.generateRandomBoat(boardSize, length);
-            }
-        }
-    } else {
-        for (let i = 0; i < length; i++) {
-            const x = startX;
-            const y = startY + i;
-            if (y < boardSize) {
-                boatCoordinates.push([x, y]);
-            } else {
-                return this.generateRandomBoat(boardSize, length);
-            }
-        }
-    }
-    return boatCoordinates;
+      if (isHorizontal) {
+          for (let i = 0; i < length; i++) {
+              const x = startX + i;
+              const y = startY;
+              if (x < boardSize) {
+                  boatCoordinates.push([x, y]);
+              } else {
+                  return this.generateRandomBoat(boardSize, length);
+              }
+          }
+      } else {
+          for (let i = 0; i < length; i++) {
+              const x = startX;
+              const y = startY + i;
+              if (y < boardSize) {
+                  boatCoordinates.push([x, y]);
+              } else {
+                  return this.generateRandomBoat(boardSize, length);
+              }
+          }
+      }
+      return boatCoordinates;
   }
 
   isValidPlacement(board, boatCoordinates) {
-    for (const [x, y] of boatCoordinates) {
-        if (board[x][y]) {
-            return false;
-        }
-    }
-    return true;
-}
+      for (const [x, y] of boatCoordinates) {
+          if (board[x][y] || !this.isCellAndSurroundingsFree(board, x, y)) {
+              return false;
+          }
+      }
+      return true;
+  }
+
+  isCellAndSurroundingsFree(board, x, y) {
+      const directions = [
+          [-1, -1], [-1, 0], [-1, 1],
+          [0, -1], [0, 0], [0, 1],
+          [1, -1], [1, 0], [1, 1]
+      ];
+
+      for (const [dx, dy] of directions) {
+          const newX = x + dx;
+          const newY = y + dy;
+          if (newX >= 0 && newX < board.length && newY >= 0 && newY < board.length) {
+              if (board[newX][newY]) {
+                  return false;
+              }
+          }
+      }
+
+      return true;
+  }
 
   markOccupiedCells(board, boatCoordinates) {
-    for (const [x, y] of boatCoordinates) {
-        board[x][y] = true;
-    }
+      for (const [x, y] of boatCoordinates) {
+          board[x][y] = true;
+      }
   }
 }
 
