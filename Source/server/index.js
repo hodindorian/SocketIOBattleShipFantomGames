@@ -127,11 +127,16 @@ io.on("connection", (socket) => {
         room.turn = room.players[0];
         room.turnIndex = 0;
       }
+      let boats1 = room.players[0].boats;
+      let boats2 = room.players[1].boats;
+
       io.to(roomId).emit("tapped", {
         index,
         room,
         hit,
         actualPlayer,
+        boats1,
+        boats2,
       });
     } catch (e) {
       console.log(e);
