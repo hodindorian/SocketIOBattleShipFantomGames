@@ -88,6 +88,7 @@ io.on("connection", (socket) => {
     }
   });
 
+
   socket.on("tap", async ({ index, roomId }) => {
     console.log("tap");
 
@@ -129,7 +130,6 @@ io.on("connection", (socket) => {
       }
       let boats1 = room.players[0].boats;
       let boats2 = room.players[1].boats;
-
       io.to(roomId).emit("tapped", {
         index,
         room,
@@ -168,8 +168,6 @@ io.on("connection", (socket) => {
   });
 
 });
-
-
 
 server.listen(port, "0.0.0.0", () => {
   console.log(`Server started and running on port ${port}`);
